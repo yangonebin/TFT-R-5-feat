@@ -8,6 +8,8 @@ import StockDetailView from '../views/StockDetailView.vue'
 import ExchangeView from '../views/ExchangeView.vue'
 import MapView from '../views/MapView.vue'
 import ArticleView from '../views/ArticleView.vue' 
+import ProductView from '@/views/ProductView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,14 +22,16 @@ const router = createRouter({
     { path: '/stock', name: 'stock', component: StockView },
     { path: '/stock/:videoId', name: 'stock-detail', component: StockDetailView },
     
-    { path: '/deposit', name: 'deposit', component: HomeView }, 
+    { path: '/deposit', name: 'deposit', component: ProductView }, 
     
     { path: '/map', name: 'map', component: MapView },
 
 
     { path: '/community', name: 'community', component: ArticleView },
     { path: '/articles', name: 'articles', component: ArticleView },
+    { path: '/products', name: 'products', component: ProductView },
   ]
 })
+
 
 export default router
