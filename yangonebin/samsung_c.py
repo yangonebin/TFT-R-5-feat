@@ -84,11 +84,18 @@ def build_data_mart():
     # 기준선 이격도 : 현재 과매수/과매도 상태인가? 
     df['dist_from_kijun'] = df['Close'] - df['kijun_sen']
 
-    # 4. Target(정답지) 생성: 내일 종가가 오늘보다 오르면 1, 아니면 0
-    # shift(-1)을 사용하여 미래 데이터를 오늘 행으로 가져옴
-    df['target'] = (df['Close'].shift(-1) > df['Close']).astype(int)
+    # 4. Target(정답지) 생성: 회귀(Regression) 모델을 위한 다중 타겟 설정
+    
+    # [Target 1] 내일의 실제 종가 (Price Regression용)
+    # shift(-1)을 사용하여 내일의 종가를 오늘 행으로 가져옴.
+    df['target_price'] = df['Close'].shift(-1)
 
-    # 결측치가 있는 행(초반 52일치) 제거 후 저장
+    # [Target 2] 내일의 등락률 (Return Regression용)
+    # (내일 종가 / 오늘 종가) - 1 공식을 사용하여 변동 비율을 계산
+    # 예: 오늘 100원 -> 내일 105원인 경우 0.05 (5%)가 기록됨
+    df['target_return'] = (df['Close'].shift(-1) / df['Close']) - 1
+
+    # 결측치가 있는 행(초반 52일치 및 타겟값이 없는 마지막 행) 제거 후 저장
     final_mart = df.dropna()
     final_mart.to_csv("samsung.csv")
     
