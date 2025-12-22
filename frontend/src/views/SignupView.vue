@@ -5,12 +5,23 @@
       <form @submit.prevent="handleSignup">
         <div class="form-group">
           <label for="username">아이디</label>
-          <input type="text" id="username" v-model="username" placeholder="아이디를 입력하세요" required />
+          <input type="text" id="username" v-model="username" placeholder="아이디" required />
         </div>
-        
+
         <div class="form-group">
           <label for="password">비밀번호</label>
-          <input type="password" id="password" v-model="password" placeholder="비밀번호를 입력하세요" required />
+          <input type="password" id="password" v-model="password" placeholder="비밀번호" required />
+        </div>
+
+        <div class="form-group">
+          <label for="passwordConfirm">비밀번호 확인</label>
+          <input 
+            type="password" 
+            id="passwordConfirm" 
+            v-model="passwordConfirm" 
+            placeholder="비밀번호를 한 번 더 입력하세요" 
+            required 
+          />
         </div>
 
         <div class="form-group">
@@ -32,14 +43,24 @@ const store = useAuthStore()
 
 const username = ref('')
 const password = ref('')
+const passwordConfirm = ref('') 
 const nickname = ref('')
 
 const handleSignup = () => {
+
+  if (password.value !== passwordConfirm.value) {
+    alert('비밀번호가 일치하지 않습니다!')
+    return
+  }
+
   const payload = {
     username: username.value,
     password: password.value,
+    password1: passwordConfirm.value, 
     nickname: nickname.value
   }
+
+  
   store.signUp(payload)
 }
 </script>

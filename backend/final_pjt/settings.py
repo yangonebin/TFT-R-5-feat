@@ -93,14 +93,20 @@ WSGI_APPLICATION = 'final_pjt.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+DB_PATH = BASE_DIR.parent / 'service_data.db'
+
+# [확인용] 서버 실행 시 터미널에 이 경로가 찍힙니다. 
+# 경로가 맞는지 눈으로 확인할 수 있습니다.
+print(f"==========================================")
+print(f"📂 연결할 DB 파일 경로: {DB_PATH}")
+print(f"==========================================")
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DB_PATH, # 위에서 만든 상대 경로 변수 사용
     }
 }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -144,6 +150,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
@@ -153,9 +162,15 @@ REST_FRAMEWORK = {
 
 REST_AUTH = {
     'USE_JWT': True,
+    'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailSerializer',
 }
 
 SITE_ID = 1
-ACCOUNT_EMAIL_VERIFICATION = 'none' 
-ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_SIGNUP_FIELDS = [
+    'username',
+    'email',
+    
+]
+AUTH_USER_MODEL = 'accounts.User'
+ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False

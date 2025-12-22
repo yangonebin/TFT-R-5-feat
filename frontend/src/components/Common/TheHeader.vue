@@ -3,9 +3,17 @@
     <div class="top-bar">
       <div class="container">
         <div class="top-menu">
-          <RouterLink :to="{ name: 'login' }" class="util-link">로그인</RouterLink>
-          <span class="divider"></span>
-          <RouterLink :to="{ name: 'signup' }" class="util-link">회원가입</RouterLink>
+          <template v-if="!store.isAuthenticated">
+            <RouterLink :to="{ name: 'login' }" class="util-link">로그인</RouterLink>
+            <span class="divider"></span>
+            <RouterLink :to="{ name: 'signup' }" class="util-link">회원가입</RouterLink>
+          </template>
+
+          <template v-else>
+            <span class="greeting">회원님 반갑습니다!</span>
+            <span class="divider"></span>
+            <a href="#" @click.prevent="store.logOut" class="util-link">로그아웃</a>
+          </template>
         </div>
       </div>
     </div>
@@ -30,10 +38,12 @@
 
 <script setup>
 import { RouterLink } from 'vue-router'
+import { useAuthStore } from '@/stores/auth' // ★ 스토어 불러오기
+
+const store = useAuthStore() // ★ 스토어 사용
 </script>
 
 <style scoped>
-
 .header-wrapper {
   background-color: white;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -63,12 +73,20 @@ import { RouterLink } from 'vue-router'
 
 .util-link {
   color: #666;
+  text-decoration: none; /* a 태그 밑줄 제거 */
   transition: color 0.2s;
+  cursor: pointer; /* 마우스 올리면 손가락 모양 */
 }
 
 .util-link:hover {
   color: var(--color-primary-light);
   font-weight: 500;
+}
+
+.greeting {
+  color: #333;
+  font-weight: 600;
+  margin-right: 4px;
 }
 
 .divider {
@@ -93,11 +111,15 @@ import { RouterLink } from 'vue-router'
   font-weight: 800; 
   color: var(--color-primary);
   letter-spacing: -0.5px;
+  text-decoration: none;
 }
 
 .gnb {
   display: flex;
   gap: 40px;
+  list-style: none; /* 리스트 점 제거 */
+  margin: 0;
+  padding: 0;
 }
 
 .nav-item {
@@ -107,6 +129,7 @@ import { RouterLink } from 'vue-router'
   padding: 8px 0;
   position: relative; 
   transition: color 0.3s;
+  text-decoration: none;
 }
 
 .nav-item:hover {
