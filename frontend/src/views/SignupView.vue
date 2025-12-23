@@ -43,13 +43,15 @@ import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 
 const store = useAuthStore()
+
+// 반응형 변수 선언
 const username = ref('')
 const nickname = ref('')
 const password = ref('')
-const passwordConfirm = ref('') // 추가
+const passwordConfirm = ref('')
 
 const signUp = function () {
-  // 프론트엔드 1차 검증
+  
   if (password.value !== passwordConfirm.value) {
     alert('비밀번호가 일치하지 않습니다.')
     return
@@ -59,21 +61,90 @@ const signUp = function () {
     username: username.value,
     nickname: nickname.value,
     password: password.value,
-    passwordConfirm: passwordConfirm.value, // 추가
+    passwordConfirm: passwordConfirm.value,
   }
+  
   store.signUp(payload)
 }
 </script>
 
 <style scoped>
-/* 이전과 동일한 스타일 유지 */
-.auth-wrapper { display: flex; justify-content: center; align-items: center; min-height: 85vh; background-color: #f0f4f8; }
-.auth-card { width: 100%; max-width: 450px; background: white; padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
-.auth-header { text-align: center; margin-bottom: 30px; }
-.auth-form { display: flex; flex-direction: column; gap: 20px; }
-.input-container { display: flex; flex-direction: column; gap: 8px; text-align: left; }
-.input-container label { font-size: 14px; font-weight: 600; color: #34495e; }
-.input-container input { padding: 14px; border: 1px solid #e0e6ed; border-radius: 8px; font-size: 15px; }
-.btn-primary { margin-top: 10px; padding: 16px; background-color: #3498db; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
-.auth-footer { margin-top: 25px; text-align: center; font-size: 14px; color: #95a5a6; }
+.auth-wrapper { 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  min-height: 85vh; 
+  background-color: #f0f4f8; 
+}
+.auth-card { 
+  width: 100%; 
+  max-width: 450px; 
+  background: white; 
+  padding: 40px; 
+  border-radius: 16px; 
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+}
+.auth-header { 
+  text-align: center; 
+  margin-bottom: 30px; 
+}
+.auth-header h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+.auth-form { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 20px; 
+}
+.input-container { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 8px; 
+  text-align: left; 
+}
+.input-container label { 
+  font-size: 14px; 
+  font-weight: 600; 
+  color: #34495e; 
+}
+.input-container input { 
+  padding: 14px; 
+  border: 1px solid #e0e6ed; 
+  border-radius: 8px; 
+  font-size: 15px; 
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input-container input:focus {
+  border-color: #3498db;
+}
+.btn-primary { 
+  margin-top: 10px; 
+  padding: 16px; 
+  background-color: #3498db; 
+  color: white; 
+  border: none; 
+  border-radius: 8px; 
+  font-size: 16px; 
+  font-weight: bold; 
+  cursor: pointer; 
+}
+.btn-primary:hover {
+  background-color: #2980b9;
+}
+.auth-footer { 
+  margin-top: 25px; 
+  text-align: center; 
+  font-size: 14px; 
+  color: #95a5a6; 
+}
+.auth-footer a {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 5px;
+}
 </style>

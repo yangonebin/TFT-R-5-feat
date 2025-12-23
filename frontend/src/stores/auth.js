@@ -8,42 +8,40 @@ export const useAuthStore = defineStore('auth', () => {
   const API_URL = 'http://127.0.0.1:8000'
   const router = useRouter()
 
-  // 로그인 여부 확인
   const isLogin = computed(() => token.value !== null)
 
-const signUp = function (payload) {
-  // 전송 전 데이터가 잘 담겼는지 확인용
-  console.log('전송 데이터:', payload)
+  // 회원가입
+  const signUp = function (payload) {
+    // 1. 프론트엔드 콘솔에서 데이터가 제대로 매핑되었는지 확인
+    console.log('전송 시도 데이터:', payload)
 
-  axios({
-    method: 'post',
-    url: `${API_URL}/accounts/signup/`,
-    data: {
-      username: payload.username,
-      nickname: payload.nickname,
-      password1: payload.password,        // 'password'가 아닌 'password1'
-      password2: payload.passwordConfirm  // 'passwordConfirm'이 아닌 'password2'
-    }
-  })
-  .then((res) => {
-    alert('회원가입이 완료되었습니다! 로그인을 진행해주세요.')
-    router.push({ name: 'login' })
-  })
-  .catch((err) => {
-    // 에러 발생 시 서버가 주는 답변을 구체적으로 확인
-    const errorData = err.response?.data
-    console.error('가입 실패 상세 이유:', errorData)
-    
-    // 무엇이 문제인지 상세히 알림
-    if (errorData?.password1) {
-      alert(`비밀번호 오류: ${errorData.password1[0]}`)
-    } else if (errorData?.username) {
-      alert(`아이디 오류: ${errorData.username[0]}`)
-    } else {
-      alert('가입 정보를 다시 확인해주세요.')
-    }
-  })
-}
+    axios({
+      method: 'post',
+      url: `${API_URL}/accounts/signup/`,
+      data: {
+        username: payload.username,
+        nickname: payload.nickname,
+        password1: payload.password,        // payload.password가 존재해야 함
+        password2: payload.passwordConfirm  // payload.passwordConfirm이 존재해야 함
+      }
+    })
+    .then((res) => {
+      alert('회원가입이 완료되었습니다! 로그인을 진행해주세요.')
+      router.push({ name: 'login' })
+    })
+    .catch((err) => {
+      const errorData = err.response?.data
+      console.error('상세 에러:', errorData)
+      
+      let msg = ""
+      if (errorData) {
+        for (const key in errorData) {
+          msg += `${key}: ${errorData[key]}\n`
+        }
+      }
+      alert(msg || "가입 실패: 서버와의 통신 중 오류가 발생했습니다.")
+    })
+  }
 
   // 로그인
   const logIn = function (payload) {
@@ -52,19 +50,23 @@ const signUp = function (payload) {
       url: `${API_URL}/accounts/login/`,
       data: payload
     })
-      .then((res) => {
-        // dj-rest-auth 응답에서 토큰 저장
-        token.value = res.data.access_token || res.data.key
-        router.push({ name: 'ProductListView' }) // 로그인 후 이동할 페이지
-      })
-      .catch((err) => alert('아이디 또는 비밀번호를 확인하세요.'))
+    .then((res) => {
+      // dj-rest-auth 설정에 따라 access 또는 key를 저장
+      token.value = res.data.access || res.data.key
+      alert('반갑습니다! 로그인이 완료되었습니다.')
+      router.push({ name: 'deposit' }) // 가입 후 이동 경로 확인 필요
+    })
+    .catch((err) => {
+      console.error(err)
+      alert('아이디 또는 비밀번호를 확인하세요.')
+    })
   }
 
-  // 로그아웃
   const logOut = function () {
     token.value = null
-    router.push({ name: 'LoginView' })
+    alert('로그아웃 되었습니다.')
+    router.push({ name: 'login' })
   }
 
   return { token, isLogin, API_URL, signUp, logIn, logOut }
-}, { persist: true }) // 새로고침해도 로그인이 유지되도록 설정 (pinia-plugin-persistedstate 설치 필요)
+}, { persist: true })
