@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/gksql/Desktop/final-pjt/mlruns_recovered/449499710150077554/0369693f681f4e129b5530712eef7596/artifacts
+end_time: 1766506271676
+entry_point_name: ''
+experiment_id: '449499710150077554'
+lifecycle_stage: active
+run_id: 0369693f681f4e129b5530712eef7596
+run_name: TFT_Seed_27
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1766506271639
+status: 3
+tags: []
+user_id: gksql

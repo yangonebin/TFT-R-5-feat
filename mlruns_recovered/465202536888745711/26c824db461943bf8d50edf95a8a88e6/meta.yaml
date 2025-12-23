@@ -1,0 +1,14 @@
+artifact_uri: file:///C:/Users/gksql/Desktop/final-pjt/mlruns_recovered/465202536888745711/26c824db461943bf8d50edf95a8a88e6/artifacts
+end_time: 1766506277919
+entry_point_name: ''
+experiment_id: '465202536888745711'
+lifecycle_stage: active
+run_id: 26c824db461943bf8d50edf95a8a88e6
+run_name: V3_5Feat_Seed_9
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1766506277880
+status: 3
+tags: []
+user_id: gksql
