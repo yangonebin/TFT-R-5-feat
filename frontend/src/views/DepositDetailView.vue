@@ -54,15 +54,26 @@ onMounted(() => {
 
 // 2. 가입하기 로직 (F03-3)
 const joinProduct = () => {
+  // 에러 원인: 'id'가 정의되지 않았음. product.value 내부의 코드를 사용해야 함.
+  const productCode = product.value.fin_prdt_cd 
+
   axios({
     method: 'post',
-    url: `${store.API_URL}/finlife/join/${product.value.fin_prdt_cd}/`,
+    url: `${store.API_URL}/finlife/join/${productCode}/`, // 변수명 확인
     headers: {
-      Authorization: `Token ${store.token}`
+      // 인증을 위해 토큰을 반드시 포함 (image_9388bb.png의 401 Unauthorized 방지)
+      Authorization: `Token ${store.token}` 
     }
   })
-  .then(() => alert('가입 목록에 추가되었습니다.'))
-  .catch(err => alert(err.response.data.message || '이미 가입된 상품입니다.'))
+  .then((res) => {
+    alert('가입이 완료되었습니다.')
+  })
+  .catch((err) => {
+    // 서버가 400 에러를 주면 '이미 가입된 상품' 알림 출력
+    const msg = err.response?.data?.message || '가입 처리 중 오류가 발생했습니다.'
+    alert(msg)
+    console.error(err)
+  })
 }
 </script>
 

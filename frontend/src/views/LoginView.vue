@@ -6,13 +6,13 @@
         <p>이용을 위해 아이디와 비밀번호를 입력해주세요.</p>
       </div>
 
-      <form @submit.prevent="logIn" class="auth-form">
+      <form @submit.prevent="handleLogin" class="auth-form">
         <div class="input-container">
           <label for="username">아이디</label>
           <input 
             type="text" 
             id="username" 
-            v-model="username" 
+            v-model.trim="username" 
             placeholder="아이디를 입력하세요" 
             required
           >
@@ -23,13 +23,15 @@
           <input 
             type="password" 
             id="password" 
-            v-model="password" 
+            v-model.trim="password" 
             placeholder="비밀번호를 입력하세요" 
             required
           >
         </div>
 
-        <button type="submit" class="btn-primary">로그인</button>
+        <button type="submit" class="btn-primary" :disabled="isLoading">
+          {{ isLoading ? '로그인 중...' : '로그인' }}
+        </button>
       </form>
 
       <div class="auth-footer">
@@ -47,37 +49,51 @@ import { useAuthStore } from '@/stores/auth'
 const store = useAuthStore()
 const username = ref('')
 const password = ref('')
+const isLoading = ref(false) // 로그인 중 버튼 비활성화를 위한 상태
 
-const logIn = function () {
+const handleLogin = async function () {
+  if (!username.value || !password.value) {
+    alert('아이디와 비밀번호를 모두 입력해주세요.')
+    return
+  }
+
+  isLoading.value = true
   const payload = {
     username: username.value,
     password: password.value
   }
-  store.logIn(payload)
+  
+  // store의 logIn 함수를 실행
+  try {
+    await store.logIn(payload)
+    // 성공 시 로직은 store.logIn 내부의 router.push가 처리함
+  } catch (err) {
+    console.error('로그인 에러:', err)
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
 <style scoped>
-/* 1. 화면 전체 중앙 정렬 */
+/* 기존 CSS 스타일 유지 */
 .auth-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh; /* 헤더를 제외한 화면의 대부분을 차지 */
-  background-color: #f0f4f8; /* 연한 파스텔 배경 */
+  min-height: 80vh;
+  background-color: #f0f4f8;
 }
 
-/* 2. 카드 형태 디자인 */
 .auth-card {
   width: 100%;
   max-width: 450px;
   background: white;
   padding: 50px 40px;
   border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* 부드러운 그림자 */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
 }
 
-/* 3. 상단 텍스트 */
 .auth-header {
   text-align: center;
   margin-bottom: 35px;
@@ -95,11 +111,10 @@ const logIn = function () {
   color: #7f8c8d;
 }
 
-/* 4. 폼 및 입력창 */
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* 요소 간 간격 확보 */
+  gap: 20px;
 }
 
 .input-container {
@@ -131,7 +146,6 @@ const logIn = function () {
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
-/* 5. 버튼 스타일 */
 .btn-primary {
   margin-top: 10px;
   padding: 16px;
@@ -145,11 +159,15 @@ const logIn = function () {
   transition: background-color 0.3s;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
   background-color: #2980b9;
 }
 
-/* 6. 푸터(회원가입 링크) */
+.btn-primary:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
 .auth-footer {
   margin-top: 30px;
   text-align: center;
