@@ -119,8 +119,9 @@ def build_lstm_regression(input_shape):
     model.compile(optimizer='adam', loss='mean_squared_error')
     return model
 
+
 # ==============================================================================
-# [Main] 실행
+# [Main] 실행 (30회 반복 - Baseline2 데이터 확보용)
 # ==============================================================================
 if __name__ == "__main__":
     # 1. 데이터 준비
@@ -136,16 +137,17 @@ if __name__ == "__main__":
     y_train, y_test = y_target[:split_index], y_target[split_index:]
     y_actual_test = y_actual[split_index:]
 
+    # 실험 이름 (나중에 분류 모델과 구분하기 쉽게 명확히!)
     experiment_name = "Samsung_Baseline_LogReturn_Regression"
     mlflow.set_experiment(experiment_name)
 
-    print(f"\n🔥 [Experiment] {experiment_name} 시작")
+    print(f"\n🔥 [Experiment] {experiment_name} 30회 수행 시작")
     print("="*60)
 
     roi_results = []
     
-    # 5회 테스트 (Seed 0~4)
-    for seed in range(5):
+    # ★ [핵심] 30번 돌려서 통계적 유의성 확보
+    for seed in range(30):
         run_name = f"LogReg_Seed_{seed}"
         
         with mlflow.start_run(run_name=run_name):
@@ -156,17 +158,15 @@ if __name__ == "__main__":
             mlflow.log_param("type", "Regression (Improved)")
             mlflow.log_param("feature", "Log Return")
             
-            print(f"\n▶ [Run {seed}/4] 모델 학습 중... (진행바가 보여야 정상입니다)")
+            print(f"\n▶ [Run {seed}/29] 모델 학습 중...")
             
             # 모델 학습
             model = build_lstm_regression((X_train.shape[1], X_train.shape[2]))
-            
-            # ★ [수정] verbose=1 로 설정하여 진행 상황 표시!
             history = model.fit(X_train, y_train, 
                                 validation_data=(X_test, y_test),
                                 epochs=30, 
                                 batch_size=32, 
-                                verbose=1,   # <--- 여기를 1로 바꿨습니다!
+                                verbose=1, # 진행바 표시
                                 shuffle=False)
             
             # 예측
@@ -179,9 +179,7 @@ if __name__ == "__main__":
             balance = initial_capital
             is_holding = False
             buy_count = 0
-            sell_count = 0
             
-            # 0보다 크면(오를 것 같으면) 매수
             THRESHOLD = 0.0 
             
             for i in range(len(pred_real) - 1):
@@ -198,7 +196,6 @@ if __name__ == "__main__":
                 else:
                     if predicted_log_ret <= THRESHOLD:
                         is_holding = False
-                        sell_count += 1
             
             final_roi = ((balance - initial_capital) / initial_capital) * 100
             roi_results.append(final_roi)
@@ -209,5 +206,5 @@ if __name__ == "__main__":
             print(f"   ㄴ [Result] Seed {seed} | ROI: {final_roi:6.2f}% | Trades: {buy_count}회")
 
     print("="*60)
-    print(f"💰 평균 수익률: {np.mean(roi_results):.2f}%")
+    print(f"💰 Baseline(Regression) 30회 평균 수익률: {np.mean(roi_results):.2f}%")
     print("="*60)
