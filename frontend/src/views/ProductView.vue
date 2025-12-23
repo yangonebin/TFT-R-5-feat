@@ -10,7 +10,6 @@
           <h2 class="sidebar-title">정기예금</h2>
           <p class="sidebar-subtitle">검색 조건을 입력하세요</p>
           <hr class="divider" />
-          
           <div class="filter-group">
             <label>은행을 선택하세요</label>
             <select v-model="selectedBank" class="styled-select">
@@ -18,7 +17,6 @@
               <option v-for="bank in bankList" :key="bank" :value="bank">{{ bank }}</option>
             </select>
           </div>
-
           <div class="filter-group">
             <label>예치기간</label>
             <select v-model="selectedPeriod" class="styled-select">
@@ -26,22 +24,15 @@
               <option v-for="period in [6, 12, 24, 36]" :key="period" :value="period">{{ period }}개월</option>
             </select>
           </div>
-
           <div class="filter-group">
             <label>상품명 검색</label>
             <input type="text" v-model="searchText" class="styled-input" placeholder="상품명을 입력하세요" />
           </div>
-
           <button class="btn-confirm" @click="resetFilters">초기화</button>
         </div>
       </aside>
 
       <main class="main-content">
-        <div class="tab-menu">
-          <span class="active-tab">정기예금</span>
-          <span class="separator">|</span>
-        </div>
-
         <div class="table-container">
           <table>
             <thead>
@@ -67,9 +58,6 @@
               </tr>
             </tbody>
           </table>
-          <div v-if="sortedProducts.length === 0" class="no-data">
-            조건에 맞는 상품이 없습니다.
-          </div>
         </div>
       </main>
     </div>
@@ -95,39 +83,38 @@ const getRate = (options, month) => {
   return target ? target.intr_rate : '-'
 }
 
-// [수정] API 호출 함수 - 엔드포인트를 백엔드 urls.py와 일치시킴
 const getProducts = () => {
-  axios.get(`${store.API_URL}/finlife/deposit/`)
-    .then(res => {
-      rawProducts.value = res.data
-    })
-    .catch(err => {
-      console.error('데이터 로드 실패:', err)
-    })
+  const BASE_URL = store.API_URL || 'http://127.0.0.1:8000'
+  axios.get(`${BASE_URL}/finlife/deposit-products/`)
+    .then(res => rawProducts.value = res.data)
+    .catch(err => console.error(err))
 }
 
-const bankList = computed(() => {
-  return [...new Set(rawProducts.value.map(p => p.kor_co_nm))]
-})
+const bankList = computed(() => [...new Set(rawProducts.value.map(p => p.kor_co_nm))])
 
-// [수정] 필터링 로직 단순화 및 정교화
 const sortedProducts = computed(() => {
   let filtered = rawProducts.value.filter(p => {
-    // 1. 은행 필터
     const isBankMatch = selectedBank.value === 'all' || p.kor_co_nm === selectedBank.value
-    // 2. 검색어 필터
     const isSearchMatch = p.fin_prdt_nm.toLowerCase().includes(searchText.value.toLowerCase())
-    // 3. 기간 필터 (선택된 기간의 금리 옵션이 존재하는지 확인)
     const isPeriodMatch = selectedPeriod.value === 'all' || p.options.some(opt => opt.save_trm === Number(selectedPeriod.value))
-    
     return isBankMatch && isSearchMatch && isPeriodMatch
   })
-
   return filtered.sort((a, b) => a.kor_co_nm.localeCompare(b.kor_co_nm))
 })
 
+// ★★★ [핵심 수정] 상세 이동 함수
 const goDetail = (product_cd) => {
-  router.push({ name: 'deposit-detail', params: { id: product_cd } })
+  // 값이 없는 경우 차단
+  if (!product_cd) {
+    alert('상품 코드가 없습니다.')
+    return
+  }
+  
+  // 라우터로 이동 (파라미터 이름: fin_prdt_cd)
+  router.push({ 
+    name: 'deposit-detail', 
+    params: { fin_prdt_cd: product_cd } 
+  })
 }
 
 const resetFilters = () => {
@@ -140,11 +127,10 @@ onMounted(getProducts)
 </script>
 
 <style scoped>
-/* 기존 스타일 유지하되 테이블 가독성을 위해 일부 보정 */
+/* 기존 스타일 유지 */
 .view-container { max-width: 1300px; margin: 0 auto; padding: 20px; font-family: 'Noto Sans KR', sans-serif; }
 .header-banner { background-color: #7aa7d6; color: white; padding: 30px; text-align: center; margin-bottom: 30px; border-radius: 4px; }
 .content-wrapper { display: flex; gap: 40px; align-items: flex-start; }
-
 .sidebar { width: 260px; flex-shrink: 0; background: white; }
 .sidebar-title { font-size: 1.2rem; color: #4a7ab5; margin-bottom: 5px; font-weight: bold; }
 .sidebar-subtitle { font-size: 0.9rem; color: #888; margin-bottom: 15px; }
@@ -153,19 +139,12 @@ onMounted(getProducts)
 .filter-group label { display: block; font-size: 0.85rem; color: #333; margin-bottom: 8px; font-weight: 500; }
 .styled-select, .styled-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; background-color: #fff; }
 .btn-confirm { width: 100%; padding: 12px; background-color: #7aa7d6; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-
 .main-content { flex-grow: 1; overflow-x: auto; }
-.tab-menu { margin-bottom: 15px; font-size: 1.1rem; }
-.active-tab { color: #333; font-weight: bold; border-bottom: 2px solid #333; padding-bottom: 2px; }
-.inactive-tab { color: #bbb; cursor: pointer; margin-left: 10px; }
-.separator { margin: 0 10px; color: #eee; }
-
 table { width: 100%; border-collapse: collapse; min-width: 800px; border: 1px solid #ddd; }
 thead th { background-color: #dae8f9; color: #333; padding: 12px; font-size: 0.85rem; border: 1px solid #c8d9ed; }
 tbody td { padding: 12px; border: 1px solid #eee; font-size: 0.85rem; text-align: center; color: #555; }
+tbody tr:hover { background-color: #f8fbff; cursor: pointer; }
 .cell-bank { color: #666; font-weight: bold; }
 .cell-product { text-align: left; padding-left: 20px; color: #333; font-weight: 500; }
 .cell-rate { font-weight: bold; color: #4a7ab5; }
-tbody tr:hover { background-color: #f8fbff; cursor: pointer; }
-.no-data { padding: 100px; text-align: center; color: #999; border: 1px solid #eee; border-top: none; }
 </style>

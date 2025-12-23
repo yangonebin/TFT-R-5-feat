@@ -1,7 +1,7 @@
 <template>
   <div class="exchange-container">
     <div class="header-banner">
-      <h1>현물 상품 시각화</h1>
+      <h1>현물 가격 변동</h1>
       <p class="subtitle">국제 금/은 시세 트렌드를 한눈에 확인하세요.</p>
     </div>
 

@@ -3,7 +3,7 @@
     <div class="auth-card">
       <div class="auth-header">
         <h1>회원가입</h1>
-        <p>나만의 금융 비서, Bankbook에 오신 것을 환영합니다!</p>
+        <p>나만의 금융 비서, FinMatch에 오신 것을 환영합니다!</p>
       </div>
 
       <form @submit.prevent="signUp" class="auth-form">
