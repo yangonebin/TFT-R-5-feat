@@ -5,29 +5,35 @@
         <h1>🗣️ 자유 게시판</h1>
         <p class="subtitle">자유롭게 이야기를 나누는 공간입니다.</p>
       </div>
-      <button class="write-btn">✏️ 글쓰기</button>
+      <button class="write-btn" @click="router.push({ name: 'article-create' })" v-if="store.isLogin">
+        ✏️ 글쓰기
+      </button>
     </header>
 
     <div class="article-list">
+      <div v-if="articles.length === 0" class="no-article">
+        아직 작성된 게시글이 없습니다. 첫 번째 글을 남겨보세요!
+      </div>
+
       <div 
         v-for="article in articles" 
         :key="article.id" 
         class="article-card"
+        @click="goDetail(article.id)"
       >
         <div class="card-main">
           <h3 class="article-title">
-            <span v-if="article.id === 1" class="notice-badge">공지</span>
             {{ article.title }}
           </h3>
           <div class="comment-count__wrapper">
-             💬 <span class="comment-count">{{ article.comment_count }}</span>
+             💬 <span class="comment-count">{{ article.comments?.length || 0 }}</span>
           </div>
         </div>
         
         <div class="card-meta">
-          <span class="author">{{ article.user }}</span>
+          <span class="author">{{ article.user_name }}</span>
           <span class="separator">·</span>
-          <span class="date">{{ article.created_at }}</span>
+          <span class="date">{{ article.created_at?.substring(0, 10) }}</span>
         </div>
       </div>
     </div>
@@ -36,41 +42,46 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-
-// 💡 임시 데이터 (백엔드가 아직 준비 안 됐을 때 화면 확인용)
-const articles = ref([
-  { id: 1, title: '커뮤니티 이용 규칙 안내 (필독)', user: '관리자', created_at: '2023.11.01', comment_count: 25 },
-  { id: 2, title: '요즘 예적금 금리 너무 낮지 않나요? ㅠㅠ', user: '김싸피', created_at: '2023.11.15', comment_count: 12 },
-  { id: 3, title: '주식 초보 질문드립니다! 삼성전자 지금 사도 될까요?', user: '이주린', created_at: '2023.11.15', comment_count: 8 },
-  { id: 4, title: '오늘 점심 메뉴 추천 좀 해주세요', user: '배고파', created_at: '2023.11.14', comment_count: 3 },
-  { id: 5, title: '환율이 계속 오르네요. 여행 갈 수 있을까요?', user: '여행가고파', created_at: '2023.11.13', comment_count: 19 },
-])
-
-// 나중에 백엔드가 준비되면 이 부분을 활성화해서 진짜 데이터를 받아오면 됩니다.
-/*
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import axios from 'axios'
-import { onMounted } from 'vue'
 
+const store = useAuthStore()
+const router = useRouter()
+const articles = ref([])
+
+// 백엔드에서 데이터 가져오기
 onMounted(() => {
   axios({
     method: 'get',
-    url: 'http://127.0.0.1:8000/api/v1/articles/'
+    // ✅ [핵심 수정] 기존 '/articles/articles/' -> '/articles/' 로 변경!
+    url: `${store.API_URL}/articles/` 
   })
-  .then(res => articles.value = res.data)
-  .catch(err => console.log(err))
+  .then(res => {
+    // ✅ [추가 기능] 최신 글이 위로 오도록 뒤집어서 저장 (.reverse())
+    articles.value = res.data.reverse()
+    console.log('게시글 목록 로드 성공:', res.data)
+  })
+  .catch(err => {
+    console.log(err)
+  })
 })
-*/
+
+// 상세 페이지로 이동 함수
+const goDetail = (id) => {
+  // router 이름이 'article-detail'인지 꼭 확인하세요!
+  router.push({ name: 'article-detail', params: { id } })
+}
 </script>
 
 <style scoped>
-
+/* 기존 스타일 그대로 유지 */
 .community-container {
   max-width: 900px; 
   margin: 40px auto; 
   padding: 0 20px;
 }
-
 
 .community-header {
   display: flex;
@@ -93,9 +104,9 @@ onMounted(() => {
   font-size: 1rem;
 }
 
-
 .write-btn {
-  background-color: var(--color-primary-light); 
+  background-color: #4dabf7; 
+  color: white;
   border: none;
   padding: 12px 24px;
   border-radius: 8px;
@@ -106,7 +117,7 @@ onMounted(() => {
 }
 
 .write-btn:hover {
-  background-color: var(--color-primary);
+  background-color: #339af0;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(49, 130, 246, 0.3);
 }
@@ -125,7 +136,7 @@ onMounted(() => {
 .article-card:hover {
   transform: translateY(-3px); 
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-  border-color: var(--color-primary-light);
+  border-color: #a5d8ff;
 }
 
 .card-main {
@@ -141,22 +152,10 @@ onMounted(() => {
   color: #343a40;
   margin: 0;
   line-height: 1.4;
-
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 80%;
-}
-
-.notice-badge {
-    background-color: #ffe3e3;
-    color: #e03131;
-    font-size: 0.8rem;
-    padding: 4px 8px;
-    border-radius: 4px;
-    margin-right: 8px;
-    vertical-align: middle;
 }
 
 .comment-count__wrapper {
@@ -169,9 +168,8 @@ onMounted(() => {
 .comment-count {
     margin-left: 4px;
     font-weight: 600;
-    color: var(--color-primary-light);
+    color: #4dabf7;
 }
-
 
 .card-meta {
   font-size: 0.9rem;
@@ -180,5 +178,11 @@ onMounted(() => {
 
 .separator {
   margin: 0 8px;
+}
+
+.no-article {
+  text-align: center;
+  padding: 40px;
+  color: #868e96;
 }
 </style>

@@ -4,69 +4,50 @@ import axios from 'axios'
 import { useRouter } from 'vue-router'
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref(null)
-  const userInfo = ref(null) // 추가: 로그인한 유저 정보를 담을 변수
-  const API_URL = 'http://127.0.0.1:8000'
   const router = useRouter()
+  const API_URL = 'http://127.0.0.1:8000'
+
+  const token = ref(null)
+  // ✅ [추가 1] 유저 정보를 저장할 변수 만들기
+  const user = ref(null) 
 
   const isLogin = computed(() => token.value !== null)
 
-  // 회원가입 (F02)
-  const signUp = function (payload) {
+  const logIn = function (payload) {
+    const { username, password } = payload
+
     axios({
       method: 'post',
-      url: `${API_URL}/accounts/signup/`,
-      data: {
-        username: payload.username,
-        nickname: payload.nickname,
-        password1: payload.password,
-        password2: payload.passwordConfirm
-      }
+      url: `${API_URL}/accounts/login/`,
+      data: { username, password }
     })
-    .then((res) => {
-      alert('회원가입이 완료되었습니다! 로그인을 진행해주세요.')
-      router.push({ name: 'login' })
-    })
-    .catch((err) => {
-      console.error('상세 에러:', err.response?.data)
-      alert("회원가입 실패: 입력한 정보를 다시 확인해주세요.")
-    })
+      .then((res) => {
+        // 1. 토큰 저장
+        token.value = res.data.access 
+        
+        // ✅ [추가 2] 유저 정보 저장 (백엔드가 보내준 user 객체)
+        // (이게 있어야 게시글 상세페이지에서 내 글인지 확인 가능)
+        user.value = res.data.user  
+        
+        console.log('로그인 성공!')
+        console.log('토큰:', token.value)
+        console.log('유저:', user.value) // 콘솔에서 유저 정보 확인 가능
+
+        router.push({ name: 'articles' })
+      })
+      .catch((err) => {
+        console.log(err)
+        alert('로그인 실패: 아이디와 비밀번호를 확인하세요.')
+      })
   }
 
-  // 로그인 (F02)
- const logIn = function (payload) {
-  axios({
-    method: 'post',
-    url: `${API_URL}/accounts/login/`,
-    data: payload
-  })
-  .then((res) => {
-    // 1. 토큰 저장
-    token.value = res.data.access || res.data.key
-    
-    // 2. 유저 정보 저장 (중요!)
-    // 서버 응답에 따라 res.data.user 전체를 넣거나 필드를 직접 지정합니다.
-    userInfo.value = res.data.user 
-    
-    // 콘솔에 찍어서 nickname이나 username이 들어있는지 꼭 확인하세요
-    console.log('로그인 유저 정보:', res.data.user)
-
-    alert('반갑습니다! 로그인이 완료되었습니다.')
-    router.push({ name: 'deposit' }) 
-  })
-  .catch((err) => {
-    console.error(err)
-    alert('아이디 또는 비밀번호를 확인하세요.')
-  })
-}
-
-  // 로그아웃 (F02)
   const logOut = function () {
     token.value = null
-    userInfo.value = null // 유저 정보 초기화
-    alert('로그아웃 되었습니다.')
+    // ✅ [추가 3] 로그아웃 시 유저 정보도 비우기
+    user.value = null 
     router.push({ name: 'login' })
   }
 
-  return { token, userInfo, isLogin, API_URL, signUp, logIn, logOut }
+  // ✅ [추가 4] return에 user 포함시키기
+  return { API_URL, token, user, isLogin, logIn, logOut }
 }, { persist: true })

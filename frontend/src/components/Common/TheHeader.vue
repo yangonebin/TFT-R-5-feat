@@ -10,12 +10,12 @@
           </template>
 
           <template v-else>
-  <span class="greeting">
-    {{ store.userInfo?.nickname || store.userInfo?.username }}님 반갑습니다!
-  </span>
-  <span class="divider"></span>
-  <a href="#" @click.prevent="store.logOut" class="util-link">로그아웃</a>
-</template>
+            <span class="greeting">
+              {{ store.user?.nickname || store.user?.username }}님 반갑습니다!
+            </span>
+            <span class="divider"></span>
+            <a href="#" @click.prevent="store.logOut" class="util-link">로그아웃</a>
+          </template>
         </div>
       </div>
     </div>
@@ -31,7 +31,7 @@
           <li><RouterLink :to="{ name: 'exchange' }" class="nav-item">현물상품</RouterLink></li>
           <li><RouterLink :to="{ name: 'stock' }" class="nav-item">주식정보</RouterLink></li>
           <li><RouterLink :to="{ name: 'map' }" class="nav-item">은행지도</RouterLink></li>
-          <li><RouterLink :to="{ name: 'community' }" class="nav-item">게시판</RouterLink></li>
+          <li><RouterLink :to="{ name: 'articles' }" class="nav-item">게시판</RouterLink></li>
         </ul>
       </div>
     </nav>
