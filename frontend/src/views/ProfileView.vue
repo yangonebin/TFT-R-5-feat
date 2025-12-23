@@ -22,15 +22,20 @@
               </div>
               <div class="info-group">
                 <label>이름</label>
-                <div class="info-value">{{ store.user?.last_name }}{{ store.user?.first_name || '정보 없음' }}</div>
+                <div class="info-value">
+                  <template v-if="store.user?.last_name || store.user?.first_name">
+                    {{ store.user?.last_name }}{{ store.user?.first_name }}
+                  </template>
+                  <template v-else>정보 없음</template>
+                </div>
               </div>
-              <button @click="isEditing = true" class="btn btn-outline">정보 수정</button>
+              <button @click="startEdit" class="btn btn-outline">정보 수정</button>
             </div>
 
             <div v-else class="info-edit-form">
               <div class="input-group">
                 <label>이메일</label>
-                <input v-model="editData.email" type="email" />
+                <input v-model="editData.email" type="email" placeholder="example@mail.com" />
               </div>
               <div class="input-group-row">
                 <div class="input-group">
@@ -43,7 +48,7 @@
                 </div>
               </div>
               <div class="edit-actions">
-                <button @click="updateProfile" class="btn btn-primary">저장</button>
+                <button @click="updateProfile" class="btn btn-primary">저장하기</button>
                 <button @click="isEditing = false" class="btn btn-cancel">취소</button>
               </div>
             </div>
@@ -62,7 +67,9 @@
           </div>
 
           <div class="card list-card">
-            <h2 class="section-title">가입한 금융 상품 <span class="count">{{ joinedProducts.length }}</span></h2>
+            <h2 class="section-title inline-title">
+              가입한 금융 상품 <span class="count">{{ joinedProducts.length }}</span>
+            </h2>
             <div v-if="joinedProducts.length > 0" class="product-grid">
               <div v-for="product in joinedProducts" :key="product.id" class="product-card" @click="goDetail(product.fin_prdt_cd)">
                 <div class="bank-info">
@@ -97,24 +104,16 @@ const store = useAuthStore()
 const router = useRouter()
 const isEditing = ref(false)
 const joinedProducts = ref([])
-
 const editData = ref({ email: '', first_name: '', last_name: '' })
 
+// 유저 정보 변경 감시
 watch(() => store.user, (u) => {
   if (u) {
     editData.value = { email: u.email || '', first_name: u.first_name || '', last_name: u.last_name || '' }
   }
 }, { immediate: true })
 
-const fetchJoinedProducts = () => {
-  axios({
-    method: 'get',
-    url: `${store.API_URL}/finlife/users/joined-products/`,
-    headers: { Authorization: `Bearer ${store.token}` }
-  })
-  .then(res => joinedProducts.value = res.data)
-  .catch(err => console.error(err))
-}
+const startEdit = () => { isEditing.value = true }
 
 const updateProfile = () => {
   axios({
@@ -125,9 +124,19 @@ const updateProfile = () => {
   })
   .then(res => {
     alert('회원 정보가 수정되었습니다.')
-    store.user = res.data
+    store.user = res.data 
     isEditing.value = false
   })
+  .catch(err => console.error(err))
+}
+
+const fetchJoinedProducts = () => {
+  axios({
+    method: 'get',
+    url: `${store.API_URL}/finlife/users/joined-products/`,
+    headers: { Authorization: `Bearer ${store.token}` }
+  })
+  .then(res => joinedProducts.value = res.data)
   .catch(err => console.error(err))
 }
 
@@ -144,64 +153,101 @@ const chartData = computed(() => ({
   }]
 }))
 
+// ★ 차트 하단 텍스트 정렬 및 말줄임표 처리 옵션
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
-  scales: { y: { beginAtZero: true, grid: { color: '#f0f0f0' } }, x: { grid: { display: false } } }
+  plugins: { 
+    legend: { display: false },
+    tooltip: {
+      callbacks: {
+        // 툴팁에서는 잘리지 않은 전체 상품명을 보여줌
+        title: (items) => joinedProducts.value[items[0].dataIndex].fin_prdt_nm
+      }
+    }
+  },
+  scales: { 
+    y: { 
+      beginAtZero: true, 
+      ticks: {
+        stepSize: 0.5,
+        callback: (value) => value.toFixed(1) + '%'
+      },
+      grid: { color: '#f0f0f0' } 
+    }, 
+    x: { 
+      grid: { display: false },
+      ticks: {
+        maxRotation: 0, // 대각선 회전 방지 (0도로 고정)
+        minRotation: 0,
+        font: { size: 11 },
+        // 긴 상품명은 8글자에서 자르고 '...' 추가
+        callback: function(value, index) {
+          const label = this.getLabelForValue(value);
+          return label.length > 8 ? label.substr(0, 8) + '...' : label;
+        }
+      }
+    } 
+  }
 }
 
 const goDetail = (code) => router.push({ name: 'deposit-detail', params: { fin_prdt_cd: code }})
 
 onMounted(() => {
   if (!store.token) router.push({ name: 'login' })
-  else fetchJoinedProducts()
+  else {
+    axios.get(`${store.API_URL}/accounts/user/`, {
+      headers: { Authorization: `Bearer ${store.token}` }
+    }).then(res => store.user = res.data)
+    fetchJoinedProducts()
+  }
 })
 </script>
 
 <style scoped>
-/* 배경 및 컨테이너 */
 .profile-bg { background-color: #f8f9fb; min-height: 100vh; padding: 40px 20px; }
 .profile-container { max-width: 1200px; margin: 0 auto; }
 .page-title { font-size: 2rem; font-weight: 800; color: #1a1a1a; margin-bottom: 40px; }
-
-/* 레이아웃 그리드 */
 .profile-grid { display: grid; grid-template-columns: 350px 1fr; gap: 30px; align-items: start; }
-
-/* 공통 카드 스타일 */
 .card { background: #fff; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f0f0f0; }
-.section-title { font-size: 1.25rem; font-weight: 700; color: #333; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
-.section-title .count { font-size: 0.9rem; background: #e7f5ff; color: #339af0; padding: 2px 10px; border-radius: 20px; }
 
-/* 유저 사이드바 */
-.user-avatar { width: 80px; height: 80px; background: #339af0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(51, 154, 240, 0.3); }
+.section-title { font-size: 1.25rem; font-weight: 700; color: #333; margin-bottom: 25px; }
+.inline-title { display: flex; align-items: center; gap: 12px; white-space: nowrap; } /* 줄바꿈 방지 */
+.section-title .count { font-size: 0.9rem; background: #e7f5ff; color: #339af0; padding: 2px 12px; border-radius: 20px; }
+
+.user-avatar { width: 80px; height: 80px; background: #339af0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
 .avatar-text { font-size: 2rem; color: #fff; font-weight: bold; }
 .info-group { margin-bottom: 20px; }
 .info-group label { font-size: 0.85rem; color: #888; display: block; margin-bottom: 5px; }
 .info-value { font-size: 1.1rem; font-weight: 600; color: #333; }
 
-/* 입력 필드 및 버튼 */
 .input-group { margin-bottom: 15px; }
 .input-group label { display: block; font-size: 0.85rem; margin-bottom: 5px; font-weight: bold; }
-.input-group input { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 10px; transition: 0.2s; }
-.input-group input:focus { border-color: #339af0; outline: none; }
+.input-group input { width: 100%; padding: 12px; border: 1.5px solid #eee; border-radius: 10px; }
 .input-group-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .btn { width: 100%; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
 .btn-outline { background: transparent; border: 1.5px solid #339af0; color: #339af0; }
 .btn-primary { background: #339af0; color: #fff; }
 .btn-cancel { background: #f1f3f5; color: #868e96; margin-top: 5px; }
-.btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
-/* 메인 대시보드 */
 .main-dashboard { display: flex; flex-direction: column; gap: 30px; }
-.chart-wrapper { height: 300px; }
+.chart-wrapper { height: 350px; } /* 차트 높이 상향 */
 
-/* 상품 리스트 카드형 */
 .product-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.product-card { background: #fbfcfe; border: 1.5px solid #f1f3f5; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; justify-content: space-between; }
-.product-card:hover { border-color: #339af0; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-.bank-tag { font-size: 0.75rem; background: #fff; border: 1px solid #ddd; padding: 2px 8px; border-radius: 5px; color: #666; font-weight: bold; }
-.product-name { font-size: 1rem; margin-top: 10px; color: #333; }
+.product-card { 
+  background: #fbfcfe; 
+  border: 1.5px solid #f1f3f5; 
+  padding: 20px; 
+  border-radius: 15px; 
+  cursor: pointer; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: space-between; 
+  min-height: 140px; /* 카드 높이 균일화 */
+}
+.product-card:hover { border-color: #339af0; background: #fff; }
+.bank-tag { font-size: 0.75rem; background: #fff; border: 1px solid #ddd; padding: 2px 8px; border-radius: 5px; color: #666; font-weight: bold; align-self: flex-start; }
+.product-name { font-size: 1rem; margin-top: 10px; color: #333; font-weight: 600; }
 .view-detail { font-size: 0.8rem; color: #339af0; font-weight: bold; margin-top: 15px; }
 
 .empty-state, .empty-list { text-align: center; padding: 40px; color: #adb5bd; }

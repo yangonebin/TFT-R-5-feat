@@ -122,6 +122,7 @@ REST_AUTH = {
     'JWT_AUTH_HTTPONLY': False,
     'REGISTER_SERIALIZER': 'accounts.serializers.CustomRegisterSerializer',
     'USER_DETAILS_SERIALIZER': 'accounts.serializers.CustomUserDetailSerializer',
+    'USER_DETAILS_SERIALIZER': 'accounts.serializers.UserProfileSerializer',
 }
 
 # django-allauth 설정

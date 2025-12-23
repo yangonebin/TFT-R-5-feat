@@ -21,7 +21,7 @@
     <div class="nav-main-bar">
       <div class="container nav-content">
         <RouterLink :to="{ name: 'home' }" class="main-logo">
-          Bankbook
+          FinMatch
         </RouterLink>
 
         <nav class="main-navigation">

@@ -4,7 +4,7 @@
       <div class="container hero-content">
         <h1 class="hero-title">
           금융의 모든 것,<br />
-          <span class="highlight">Bankbook</span>에서 시작하세요.
+          <span class="highlight">FinMatch</span>에서 시작하세요.
         </h1>
         <p class="hero-desc">
           예적금 금리 비교부터 AI 맞춤 자산 관리까지.<br />
@@ -20,7 +20,7 @@
     <section class="container services-section">
       <div class="section-header">
         <h2>주요 서비스</h2>
-        <p>Bankbook이 제공하는 핵심 기능을 만나보세요</p>
+        <p>FinMatch이 제공하는 핵심 기능을 만나보세요</p>
       </div>
 
       <div class="grid-container">
