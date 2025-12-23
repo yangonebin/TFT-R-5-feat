@@ -4,13 +4,12 @@ from .models import DepositProducts, DepositOptions
 class DepositOptionsSerializer(serializers.ModelSerializer):
     class Meta:
         model = DepositOptions
-        fields = ('save_trm', 'intr_rate', 'intr_rate2')
+        fields = '__all__'
 
 class DepositProductsSerializer(serializers.ModelSerializer):
-    # 역참조를 통해 상품에 딸린 금리 옵션들을 가져옴
+    # 가입한 상품 목록 조회 시 금리 옵션들도 함께 가져오도록 설정
     options = DepositOptionsSerializer(many=True, read_only=True)
 
     class Meta:
         model = DepositProducts
         fields = '__all__'
-        

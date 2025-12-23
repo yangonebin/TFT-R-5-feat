@@ -1,68 +1,118 @@
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework import status # status 코드 사용 권장
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import status
 from .models import DepositProducts, DepositOptions
-from .serializers import DepositProductsSerializer
+from .serializers import DepositProductsSerializer, DepositOptionsSerializer
+from django.conf import settings
+import requests
 import pandas as pd
 import os
-from django.conf import settings
 
-
-
+# ==========================================
+# 0. [필수] 데이터 저장 기능 (이게 없어서 목록이 비어있던 겁니다!)
+# ==========================================
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def save_deposit_products(request):
+    # API 키 확인 (settings.py에 FINLIFE_API_KEY가 있어야 함, 없으면 직접 입력)
+    api_key = getattr(settings, 'FINLIFE_API_KEY', '여기에_API_KEY_직접입력가능') 
+    
+    url = f'http://finlife.fss.or.kr/finlifeapi/depositProductsSearch.json?auth={api_key}&topFinGrpNo=020000&pageNo=1'
+    
+    try:
+        response = requests.get(url).json()
+        baseList = response.get('result').get('baseList')
+        optionList = response.get('result').get('optionList')
+
+        # 1. 상품 기본 정보 저장
+        for product in baseList:
+            save_data = {
+                'fin_prdt_cd': product.get('fin_prdt_cd'),
+                'kor_co_nm': product.get('kor_co_nm'),
+                'fin_prdt_nm': product.get('fin_prdt_nm'),
+                'etc_note': product.get('etc_note'),
+                'join_way': product.get('join_way'),
+                'spcl_cnd': product.get('spcl_cnd'),
+            }
+            serializer = DepositProductsSerializer(data=save_data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+
+        # 2. 상품 옵션 정보 저장
+        for option in optionList:
+            prdt_cd = option.get('fin_prdt_cd')
+            product = DepositProducts.objects.get(fin_prdt_cd=prdt_cd)
+            
+            save_data = {
+                'fin_prdt_cd': prdt_cd,
+                'intr_rate_type_nm': option.get('intr_rate_type_nm'),
+                'intr_rate': option.get('intr_rate') if option.get('intr_rate') else -1,
+                'intr_rate2': option.get('intr_rate2') if option.get('intr_rate2') else -1,
+                'save_trm': option.get('save_trm'),
+            }
+            
+            # 이미 있는지 확인 후 저장
+            if not DepositOptions.objects.filter(fin_prdt_cd=prdt_cd, save_trm=option.get('save_trm')).exists():
+                serializer = DepositOptionsSerializer(data=save_data)
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save(product=product)
+
+        return Response({'message': '데이터 저장 성공!'}, status=status.HTTP_200_OK)
+    
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# ==========================================
+# 1. 정기 예금 상품 관련 (목록, 상세, 가입)
+# ==========================================
+
+# [목록 조회]
+@api_view(['GET'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def product_list(request):
-    """
-    F03-2: 은행별 필터 기능
-    """
     bank_name = request.query_params.get('bank')
     products = DepositProducts.objects.all()
     
-    if bank_name and bank_name != 'all': # 프론트엔드 'all' 값 대응
+    if bank_name and bank_name != 'all': 
         products = products.filter(kor_co_nm=bank_name)
     
     serializer = DepositProductsSerializer(products, many=True)
     return Response(serializer.data)
 
+
+# [상세 조회] - 상세 페이지 연결용
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def deposit_product_detail(request, fin_prdt_cd):
+    product = get_object_or_404(DepositProducts, fin_prdt_cd=fin_prdt_cd)
+    serializer = DepositProductsSerializer(product)
+    return Response(serializer.data)
+
+
+# [상품 가입]
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def join_product(request, product_cd):
-    """
-    F03-3: 금융상품 가입 및 중복 체크 로직
-    """
-    user = request.user
+    product = get_object_or_404(DepositProducts, fin_prdt_cd=product_cd)
     
-    # 1. 기존 가입 목록 가져오기 및 공백 제거
-    # None이면 빈 문자열로 처리하고 양 끝 공백을 제거함
-    raw_str = (user.financial_products or "").strip()
+    if product.join_users.filter(pk=request.user.pk).exists():
+        return Response({'message': '이미 가입된 상품입니다.'}, status=status.HTTP_400_BAD_REQUEST)
     
-    # 2. 리스트 변환 (매우 중요!)
-    # split(',') 후 각 요소의 공백을 제거하고, 빈 문자열이 아닌 것만 리스트에 담음
-    joined_list = [p.strip() for p in raw_str.split(',') if p.strip()]
-    
-    # 3. 중복 체크
-    # 이제 리스트에는 실제 상품 코드들만 들어있으므로 정확한 비교가 가능함
-    if product_cd in joined_list:
-        return Response(
-            {"message": "이미 가입된 상품입니다."}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
-    # 4. 새로운 상품 코드 추가
-    joined_list.append(product_cd)
-    
-    # 5. 다시 콤마로 연결하여 저장
-    user.financial_products = ",".join(joined_list)
-    user.save()
-    
-    return Response(
-        {"message": "가입이 완료되었습니다.", "joined_list": joined_list}, 
-        status=status.HTTP_201_CREATED
-    )
+    product.join_users.add(request.user)
+    return Response({'message': '상품 가입이 완료되었습니다.'}, status=status.HTTP_201_CREATED)
 
+
+# ==========================================
+# 2. 금/은 시세 관련
+# ==========================================
 @api_view(['GET'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def gold_silver_prices(request):
     asset = request.query_params.get('asset', 'gold').lower()
@@ -70,68 +120,53 @@ def gold_silver_prices(request):
     end_date = request.query_params.get('end_date')
 
     file_name = 'Gold_prices.xlsx' if asset == 'gold' else 'Silver_prices.xlsx'
-    file_path = os.path.join(settings.BASE_DIR, 'data', file_name)
+    # 보내주신 사진에 따라 'Gold' 폴더로 지정
+    file_path = os.path.join(settings.BASE_DIR, 'Gold', file_name)
 
     if not os.path.exists(file_path):
-        return Response({"error": "파일 없음"}, status=404)
+        return Response({"error": f"파일 없음: {file_path}"}, status=404)
 
     try:
-        # 1. 엑셀 읽기 (헤더가 이상할 수 있으니 넉넉하게 읽음)
         df = pd.read_excel(file_path, engine='openpyxl')
-
-        # 2. 날짜 컬럼 찾기 (대소문자 구분 없이 'date'가 포함된 컬럼 찾기)
-        # 엑셀에 'Date', 'date', 'Name' 등이 섞여 있어도 찾을 수 있게 함
-        date_col = None
-        for col in df.columns:
-            if 'date' in str(col).lower():
-                date_col = col
-                break
         
-        # 날짜 컬럼을 못 찾았으면 첫 번째 컬럼을 날짜로 가정
-        if not date_col:
-            date_col = df.columns[0]
-
-        # 날짜 포맷 통일
+        # 날짜 컬럼 찾기
+        date_col = next((col for col in df.columns if 'date' in str(col).lower()), df.columns[0])
         df = df.rename(columns={date_col: 'date'})
         df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
 
-        # 3. 가격 컬럼 찾기 (가장 중요한 부분!)
-        # 날짜가 아닌 컬럼 중에서, 이름에 'USD'가 있거나 'Price'가 있는 것을 우선 선택
-        price_col = None
-        candidates = [c for c in df.columns if c != 'date']
-
-        # 우선순위 1: 'USD'가 들어간 컬럼 (예: USD (PM))
-        for c in candidates:
-            if 'USD' in str(c):
-                price_col = c
-                break
+        # 가격 컬럼 찾기
+        price_col = next((c for c in df.columns if c != 'date' and 'USD' in str(c)), None)
+        if not price_col:
+             # USD가 없으면 두번째 컬럼을 가격으로
+             price_col = df.columns[1] if len(df.columns) > 1 else None
         
-        # 우선순위 2: 못 찾았으면 그냥 날짜 뺴고 첫 번째 컬럼 선택
-        if not price_col and candidates:
-            price_col = candidates[0]
-
-        # 4. 가격 컬럼 이름 통일 및 데이터 정제
         if price_col:
             df = df.rename(columns={price_col: 'price'})
-            # 숫자가 아닌 값(결측치 등) 강제 변환 및 제거
             df['price'] = pd.to_numeric(df['price'], errors='coerce')
-            df = df.dropna(subset=['price']) # 가격 없는 행 삭제
-        else:
-             return Response({"error": "가격 데이터를 찾을 수 없습니다."}, status=500)
+            df = df.dropna(subset=['price'])
+            
+        df = df[['date', 'price']].sort_values('date')
 
-        # 5. 필요한 컬럼만 선택 및 필터링
-        df = df[['date', 'price']]
-
-        if start_date:
-            df = df[df['date'] >= start_date]
-        if end_date:
-            df = df[df['date'] <= end_date]
+        if start_date: df = df[df['date'] >= start_date]
+        if end_date: df = df[df['date'] <= end_date]
         
-        # 시간순 정렬 (차트가 꼬이지 않게)
-        df = df.sort_values('date')
-
         return Response(df.to_dict(orient='records'))
 
     except Exception as e:
-        print(f"Error processing {asset}: {e}")
         return Response({"error": str(e)}, status=500)
+    
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_joined_products(request):
+    # models.py에서 related_name='deposit_products'로 설정했으므로 이렇게 접근 가능
+    products = request.user.deposit_products.all()
+    serializer = UserJoinedProductSerializer(products, many=True)
+    return Response(serializer.data)    
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_joined_products(request):
+    # 현재 로그인한 유저가 가입한 상품들만 가져옴
+    products = request.user.deposit_products.all()
+    serializer = DepositProductsSerializer(products, many=True)
+    return Response(serializer.data)
