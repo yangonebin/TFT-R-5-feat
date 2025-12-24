@@ -28,3 +28,6 @@ django-cors-headers
 dj-rest-auth
 django-allauth
 djangorestframework-simplejwt
+pandas          
+openpyxl         
+numpy            
