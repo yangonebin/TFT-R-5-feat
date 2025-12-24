@@ -28,6 +28,9 @@
           <RouterLink :to="{ name: 'deposit' }" class="nav-item">예금비교</RouterLink>
           <RouterLink :to="{ name: 'exchange' }" class="nav-item">현물가격</RouterLink>
           <RouterLink :to="{ name: 'stock' }" class="nav-item">주식정보</RouterLink>
+
+          <RouterLink :to="{ name: 'stock-predict' }" class="nav-item">AI 주가예측</RouterLink>
+
           <RouterLink :to="{ name: 'map' }" class="nav-item">은행지도</RouterLink>
           <RouterLink :to="{ name: 'articles' }" class="nav-item">게시판</RouterLink>
         </nav>
@@ -66,7 +69,8 @@ const store = useAuthStore()
 
 .top-content {
   display: flex;
-  justify-content: flex-end; /* 오른쪽 끝 정렬 */
+  justify-content: flex-end;
+  /* 오른쪽 끝 정렬 */
   width: 100%;
 }
 
@@ -107,7 +111,8 @@ const store = useAuthStore()
 
 .nav-content {
   display: flex;
-  justify-content: space-between; /* 양 끝 정렬 */
+  justify-content: space-between;
+  /* 양 끝 정렬 */
   align-items: center;
   width: 100%;
 }
@@ -118,13 +123,15 @@ const store = useAuthStore()
   font-weight: 900;
   color: #339af0;
   text-decoration: none;
-  font-style: italic; /* 사용자님 로고 스타일 반영 */
+  font-style: italic;
+  /* 사용자님 로고 스타일 반영 */
 }
 
 /* 서비스 메뉴: 오른쪽 정렬 */
 .main-navigation {
   display: flex;
-  gap: 30px; /* 메뉴 간 간격 */
+  gap: 30px;
+  /* 메뉴 간 간격 */
 }
 
 .nav-item {
@@ -147,6 +154,7 @@ const store = useAuthStore()
   .main-navigation {
     gap: 15px;
   }
+
   .nav-item {
     font-size: 0.9rem;
   }

@@ -15,6 +15,9 @@ import ArticleDetailView from '@/views/ArticleDetailView.vue'
 import ArticleCreateView from '@/views/ArticleCreateView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 
+// ✅ 1. 새로 만든 뷰 파일을 import 해주세요
+import StockPredictorView from '@/views/StockPredictorView.vue'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -23,13 +26,18 @@ const router = createRouter({
     { path: '/login', name: 'login', component: LoginView },
     { path: '/signup', name: 'signup', component: SignupView },
     { path: '/exchange', name: 'exchange', component: ExchangeView },
+    
+    // [주식 관련]
     { path: '/stock', name: 'stock', component: StockView },
     { path: '/stock/:videoId', name: 'stock-detail', component: StockDetailView },
     
+    // ✅ 2. AI 예측 페이지 경로를 추가해주세요 (충돌 방지를 위해 별도 경로 추천)
+    { path: '/predict', name: 'stock-predict', component: StockPredictorView },
+
     // [예금 목록]
     { path: '/deposit', name: 'deposit', component: ProductView }, 
     
-    // [예금 상세] ★ 변수명 fin_prdt_cd 확인 필수!
+    // [예금 상세]
     { path: '/deposit/:fin_prdt_cd', name: 'deposit-detail', component: DepositDetailView },
     
     { path: '/map', name: 'map', component: MapView },
