@@ -206,3 +206,4 @@ FinMatch는 개인 금융 데이터를 기반으로
 ![alt text](/img/image-7.png)
 ![alt text](/img/image-8.png)
 ![alt text](/img/image-9.png)
+![alt text](/img/image.png)
