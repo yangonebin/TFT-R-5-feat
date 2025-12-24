@@ -8,11 +8,9 @@ from tensorflow.keras import layers, Model, Input
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-# --- [ 1. 재현성 극대화 설정: SEED 22 ] ---
+# [환경 설정]
 SEED = 22
 os.environ['PYTHONHASHSEED'] = str(SEED)
-os.environ['TF_DETERMINISTIC_OPS'] = '1'
-os.environ['TF_CUDNN_DETERMINISTIC'] = '1'
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -20,18 +18,25 @@ random.seed(SEED)
 np.random.seed(SEED)
 tf.random.set_seed(SEED)
 
-# --- [ 2. TFT 아키텍처 정의 ] ---
+# --- [ 아키텍처 정의 (호환성 패치 적용) ] ---
 
 def variable_selection_network(x, units, num_features):
     feature_embeddings = []
     for i in range(num_features):
-        feat = layers.Lambda(lambda x, i=i: x[:, :, i:i+1])(x)
+        # ✅ [핵심] i=i 대신 arguments를 사용해야 '원래 서버 코드'에서 에러 없이 로드됩니다.
+        feat = layers.Lambda(
+            lambda t, idx: t[:, :, idx:idx+1], 
+            arguments={'idx': i}
+        )(x)
         feature_embeddings.append(layers.Dense(units)(feat))
+        
     combined = layers.Concatenate()(feature_embeddings)
     weights = layers.Dense(num_features, activation='softmax')(combined)
+    
     stacked_features = layers.Lambda(lambda x: tf.stack(x, axis=2))(feature_embeddings)
     expanded_weights = layers.Reshape((-1, num_features, 1))(weights)
     weighted_features = layers.Multiply()([stacked_features, expanded_weights])
+    
     return layers.Lambda(lambda x: tf.reduce_sum(x, axis=2))(weighted_features)
 
 def gated_residual_network(x, units, dropout_rate=0.1):
@@ -56,33 +61,28 @@ def build_beast_tft(window_size, num_features, units=64):
     model.compile(optimizer=tf.keras.optimizers.Adam(1e-4), loss='mse')
     return model
 
-# --- [ 3. 실전 전체 학습 실행 함수 ] ---
+# --- [ 학습 실행 ] ---
 
-def train_production_model():
-    print(f"🚀 [SEED 22] Beast V3: 전체 데이터 기반 실전 학습 시작 (150 Epochs)")
+if __name__ == "__main__":
+    print("🚀 [재학습] 파일 생성 시작 (beast_scaler.pkl, beast_tft_full.h5)...")
     
-    # 데이터 수집 (삼성전자)
     df = yf.download("005930.KS", period="max", auto_adjust=True, progress=False)
     if isinstance(df.columns, pd.MultiIndex): df.columns = df.columns.get_level_values(0)
     df = df[['Open', 'High', 'Low', 'Close', 'Volume']].ffill().dropna()
     
-    # 로그 수익률 기반 피처 엔지니어링
     feature_cols = []
     for col in df.columns:
         new_name = f'Log_Ret_{col}'
         df[new_name] = np.log((df[col] + 1e-9) / (df[col].shift(1) + 1e-9))
         feature_cols.append(new_name)
     
-    # 타겟 설정: 내일의 실제 수익률
     df['actual_ret'] = (df['Close'].shift(-1) / df['Close']) - 1
     df = df.dropna()
     
-    # StandardScaler 적용 및 저장 (FastAPI 서빙 필수템)
     scaler = StandardScaler()
     df[feature_cols] = scaler.fit_transform(df[feature_cols])
-    joblib.dump(scaler, 'beast_scaler.pkl')
+    joblib.dump(scaler, 'beast_scaler.pkl') # ✅ 여기서 스케일러 파일 생성
     
-    # 20일 윈도우 시퀀스 생성
     X, y = [], []
     data, ret = df[feature_cols].values, df['actual_ret'].values
     for i in range(len(df) - 20):
@@ -90,19 +90,8 @@ def train_production_model():
         y.append(ret[i+20-1])
     X, y = np.array(X), np.array(y)
 
-    # 모델 빌드 및 학습
     model = build_beast_tft(X.shape[1], X.shape[2])
-    
-    # ✅ 핵심: 분리 없이 전체 학습, 150 에폭 준수, 셔플 비활성화
     model.fit(X, y, epochs=150, batch_size=128, verbose=1, shuffle=False)
     
-    # 최종 결과물 저장
-    model.save('beast_tft_full.h5')
-    print("\n" + "="*50)
-    print("✅ Beast V3 (Seed 22) 실전 모델 저장 완료!")
-    print("- Model: beast_tft_full.h5")
-    print("- Scaler: beast_scaler.pkl")
-    print("="*50)
-
-if __name__ == "__main__":
-    train_production_model()
+    model.save('beast_tft_full.h5') # ✅ 여기서 모델 파일 생성
+    print("\n✅ 파일 생성 완료! 이제 서버 코드를 실행하세요.")
