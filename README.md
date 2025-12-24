@@ -1,93 +1,208 @@
-# final-pjt
+# 💰 FinMatch (핀매치)
 
+> **스마트한 자산 관리부터 AI 주가 예측까지, All-in-One 금융 플랫폼**
 
+FinMatch는 개인 금융 데이터를 기반으로  
+**자산 관리 · 금융상품 비교 · AI 주가 예측 · 위치 기반 은행 탐색**을 하나의 플랫폼에서 제공하는 통합 금융 서비스입니다.
 
-## Getting started
+---
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## 📌 프로젝트 개요
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- **프로젝트명**: FinMatch (핀매치)  
+- **목표**:  
+  - 금융 데이터를 직관적으로 시각화  
+  - AI 기반 주가 예측을 통한 의사결정 지원  
+  - 사용자 맞춤 금융 상품 추천  
+- **핵심 키워드**:  
+  `AI Forecasting` · `Asset Management` · `FinTech` · `Full-Stack`
 
-## Add your files
+---
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## 👨‍💻 팀원 정보 및 역할 분담
 
-```
-cd existing_repo
-git remote add origin https://lab.ssafy.com/1231yw1103/final-pjt.git
-git branch -M master
-git push -uf origin master
-```
+### 👑 장영철 (Team Leader)
 
-## Integrate with your tools
+**Full Stack · Frontend Lead · Core Backend**
 
-- [ ] [Set up project integrations](https://lab.ssafy.com/1231yw1103/final-pjt/-/settings/integrations)
+#### 담당 영역 및 업무
 
-## Collaborate with your team
+**Frontend**
+- Vue 3 기반 전체 아키텍처 설계 및 공통 컴포넌트 개발
+- Pinia 상태 관리 및 Axios 모듈화 구조 설계
+- UI/UX 구현  
+  - 메인 / 프로필 / 커뮤니티 페이지  
+  - 반응형 디자인 적용
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+**Backend**
+- Django 서버 초기 환경 구축
+- DB ERD 설계
+- JWT 기반 회원가입 · 로그인(Auth) 시스템 구현
 
-## Test and Deploy
+**Visualization**
+- Kakao Maps API 연동  
+  - 주변 은행 탐색  
+  - 마커 클러스터링
+- Chart.js 기반 포트폴리오 시각화
 
-Use the built-in continuous integration in GitLab.
+---
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+### 🧠 양한빈 (Team Member)
 
-***
+**AI Researcher · Backend · Data Engineer**
 
-# Editing this README
+#### 담당 영역 및 업무
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+**AI Modeling**
+- SOTA 주가 예측 모델 **TFT-R (Temporal Fusion Transformer-Regression)** 개발
+- VSN(Variable Selection Network) 기반 노이즈 제거 로직 구현
 
-## Suggestions for a good README
+**MLOps**
+- FastAPI 기반 실시간 AI 추론(Inference) 마이크로서비스 구축
+- MLflow 활용 실험 추적 및 모델 버전 관리
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+**Data Engineering**
+- yfinance 기반 20년치 시계열 데이터 전처리 파이프라인 구축
+- 금융감독원 예·적금 API 및 환율 데이터 파싱 로직 구현
 
-## Name
-Choose a self-explaining name for your project.
+---
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## 🛠 기술 스택 (Tech Stack)
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+### Frontend
+- Vue 3
+- Pinia
+- Axios
+- Chart.js
+- Kakao Maps API
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### Backend & Database
+- Django
+- Django REST Framework
+- JWT Authentication
+- PostgreSQL
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### AI & MLOps
+- PyTorch
+- Temporal Fusion Transformer (TFT)
+- FastAPI
+- MLflow
+- yfinance
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+---
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## 🌟 핵심 기능 (Key Features)
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### 📈 AI 주가 예측 (TFT-R Engine)
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+> *“단순한 예측을 넘어, 시장의 맥락을 읽다”*
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+- **실시간 예측**
+  - 사용자가 조회 시 최신 데이터를 수집하여 향후 등락률 예측
+- **직관적 시그널 제공**
+  - 강력 매수 / 보유 / 매도 등 행동 중심 가이드
+- **근거 시각화**
+  - 최근 20일 차트 흐름
+  - AI가 분석한 주요 추세선 제공
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+---
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+### 🏦 금융 상품 원스톱 관리
 
-## License
-For open source projects, say how it is licensed.
+- **예·적금 비교**
+  - 1금융권 및 저축은행 상품 전체 비교
+  - 금리순 / 기간별 필터 제공
+- **하이브리드 추천 시스템**
+  - 사용자 정보(나이, 자산, 연봉) 기반
+  - 유사 유저 선택 이력 활용 (Collaborative Filtering)
+- **AI 챗봇 금융 상담**
+  - 자연어 질의 응답  
+  - 예:  
+    > “사회초년생을 위한 공격적인 투자 상품 추천해줘”
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+---
+
+### 🗺 위치 기반 은행 찾기
+
+- **스마트 검색**
+  - 내 주변 은행 및 ATM을 지도 위에 표시
+- **경로 안내**
+  - 현재 위치 → 선택 은행  
+  - 최적 이동 경로 시각화 (Kakao Mobility)
+
+---
+
+## 🧠 AI 알고리즘 상세 (Technical Deep Dive)
+
+본 프로젝트는 기존 **LSTM 기반 시계열 모델의 한계**를 극복하기 위해  
+**Temporal Fusion Transformer (TFT)** 아키텍처를 주가 예측에 적용했습니다.
+
+### 🏗 모델 아키텍처
+
+#### 🔹 Variable Selection Network (VSN)
+
+- **문제**
+  - 환율, 금리 등 14개 거시경제 변수가 오히려 노이즈로 작용
+- **해결**
+  - AI가 자동으로 **핵심 5개 피처 (OHLCV)** 만 선택
+  - 학습 안정성 및 예측 성능 향상
+
+#### 🔹 Multi-Head Attention
+
+- 과거 20일 데이터 중  
+  현재 주가 형성에 결정적인 **‘골든 타임’**에 가중치 부여
+
+---
+
+### 📊 성과 (Simulation Result)
+
+| 지표 | 결과 |
+|---|---|
+| 평균 ROI | **103.68%** |
+| 최고 ROI | **292.45%** |
+
+> **결론**  
+> 노이즈를 제거한 5-Feature 회귀 모델이  
+> 복잡한 다변수 모델 대비 압도적인 성능을 기록
+
+---
+
+## 💬 프로젝트 회고 (Retrospective)
+
+### 장영철 (팀장)
+
+> “프론트엔드부터 백엔드까지 전체 흐름을 주도하며  
+> 풀스택 개발자로서의 가능성을 확인했습니다.  
+>  
+> Vue 3의 컴포넌트 재사용성을 극대화하고  
+> Django와의 비동기 통신을 최적화하는 과정에서  
+> 실질적인 성장을 경험했습니다.  
+>  
+> 지도 API와 차트 라이브러리를 활용하며  
+> **데이터 시각화의 중요성**을 깊이 체감한 프로젝트였습니다.”
+
+---
+
+### 양한빈 (팀원) — *데이터 사이언티스트의 양심*
+
+> “초기에는 복잡한 모델이 항상 더 좋을 것이라 믿었습니다.  
+> 하지만 우연히 실험한 ‘단순한 모델’이  
+> **100% 이상의 수익률**을 기록하며 제 생각을 완전히 바꿨습니다.  
+>  
+> 준비했던 보고서를 과감히 폐기하고 모델을 피벗하며  
+>  
+> **‘기술적 고집보다, 데이터가 말하는 진실을 따르는 것이  
+> 엔지니어의 양심’**  
+>  
+> 이라는 중요한 교훈을 얻은 뜻깊은 프로젝트였습니다.”
+
+실행화면 ![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image-4.png)
+![alt text](image-5.png)
+![alt text](image-6.png)
+![alt text](image-7.png)
+![alt text](image-8.png)
+![alt text](image-9.png)
