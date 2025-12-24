@@ -1,146 +1,200 @@
-💰 FinMatch (핀매치)
+# 💰 FinMatch (핀매치)
 
-스마트한 자산 관리부터 AI 주가 예측까지, All-in-One 금융 플랫폼
+> **스마트한 자산 관리부터 AI 주가 예측까지, All-in-One 금융 플랫폼**
 
-1. 👨‍💻 팀원 정보 및 역할 분담
+FinMatch는 개인 금융 데이터를 기반으로  
+**자산 관리 · 금융상품 비교 · AI 주가 예측 · 위치 기반 은행 탐색**을 하나의 플랫폼에서 제공하는 통합 금융 서비스입니다.
 
-👑 장영철 (Team Leader)
+---
 
-Full Stack Frontend Lead Core Backend
+## 📌 프로젝트 개요
 
-영역
+- **프로젝트명**: FinMatch (핀매치)  
+- **목표**:  
+  - 금융 데이터를 직관적으로 시각화  
+  - AI 기반 주가 예측을 통한 의사결정 지원  
+  - 사용자 맞춤 금융 상품 추천  
+- **핵심 키워드**:  
+  `AI Forecasting` · `Asset Management` · `FinTech` · `Full-Stack`
 
-상세 담당 업무
+---
 
-Frontend
+## 👨‍💻 팀원 정보 및 역할 분담
 
-• Vue 3 기반 전체 아키텍처 설계 및 공통 컴포넌트 개발
+### 👑 장영철 (Team Leader)
 
+**Full Stack · Frontend Lead · Core Backend**
 
+#### 담당 영역 및 업무
 
-• Pinia 상태 관리 및 Axios 모듈화 구조 설계
+**Frontend**
+- Vue 3 기반 전체 아키텍처 설계 및 공통 컴포넌트 개발
+- Pinia 상태 관리 및 Axios 모듈화 구조 설계
+- UI/UX 구현  
+  - 메인 / 프로필 / 커뮤니티 페이지  
+  - 반응형 디자인 적용
 
+**Backend**
+- Django 서버 초기 환경 구축
+- DB ERD 설계
+- JWT 기반 회원가입 · 로그인(Auth) 시스템 구현
 
+**Visualization**
+- Kakao Maps API 연동  
+  - 주변 은행 탐색  
+  - 마커 클러스터링
+- Chart.js 기반 포트폴리오 시각화
 
-• UI/UX: 메인, 프로필, 커뮤니티 페이지 반응형 디자인 구현
+---
 
-Backend
+### 🧠 양한빈 (Team Member)
 
-• Django 서버 초기 구축 및 DB ERD 설계
+**AI Researcher · Backend · Data Engineer**
 
+#### 담당 영역 및 업무
 
+**AI Modeling**
+- SOTA 주가 예측 모델 **TFT-R (Temporal Fusion Transformer-Regression)** 개발
+- VSN(Variable Selection Network) 기반 노이즈 제거 로직 구현
 
-• JWT 기반 회원가입/로그인(Auth) 시스템 구현
+**MLOps**
+- FastAPI 기반 실시간 AI 추론(Inference) 마이크로서비스 구축
+- MLflow 활용 실험 추적 및 모델 버전 관리
 
-Visualization
+**Data Engineering**
+- yfinance 기반 20년치 시계열 데이터 전처리 파이프라인 구축
+- 금융감독원 예·적금 API 및 환율 데이터 파싱 로직 구현
 
-• Kakao Maps API 연동 (주변 은행 찾기, 마커 클러스터링)
+---
 
+## 🛠 기술 스택 (Tech Stack)
 
+### Frontend
+- Vue 3
+- Pinia
+- Axios
+- Chart.js
+- Kakao Maps API
 
-• Chart.js 활용 포트폴리오 시각화
+### Backend & Database
+- Django
+- Django REST Framework
+- JWT Authentication
+- PostgreSQL
 
-🧠 양한빈 (Team Member)
+### AI & MLOps
+- PyTorch
+- Temporal Fusion Transformer (TFT)
+- FastAPI
+- MLflow
+- yfinance
 
-AI Researcher Backend Data Engineer
+---
 
-영역
+## 🌟 핵심 기능 (Key Features)
 
-상세 담당 업무
+### 📈 AI 주가 예측 (TFT-R Engine)
 
-AI Modeling
+> *“단순한 예측을 넘어, 시장의 맥락을 읽다”*
 
-• SOTA 주가 예측 모델(TFT-R) 개발 및 고도화
+- **실시간 예측**
+  - 사용자가 조회 시 최신 데이터를 수집하여 향후 등락률 예측
+- **직관적 시그널 제공**
+  - 강력 매수 / 보유 / 매도 등 행동 중심 가이드
+- **근거 시각화**
+  - 최근 20일 차트 흐름
+  - AI가 분석한 주요 추세선 제공
 
+---
 
+### 🏦 금융 상품 원스톱 관리
 
-• 노이즈 제거를 위한 VSN(Variable Selection Network) 구현
+- **예·적금 비교**
+  - 1금융권 및 저축은행 상품 전체 비교
+  - 금리순 / 기간별 필터 제공
+- **하이브리드 추천 시스템**
+  - 사용자 정보(나이, 자산, 연봉) 기반
+  - 유사 유저 선택 이력 활용 (Collaborative Filtering)
+- **AI 챗봇 금융 상담**
+  - 자연어 질의 응답  
+  - 예:  
+    > “사회초년생을 위한 공격적인 투자 상품 추천해줘”
 
-MLOps
+---
 
-• FastAPI 기반 실시간 AI 추론(Inference) 마이크로서비스 구축
+### 🗺 위치 기반 은행 찾기
 
+- **스마트 검색**
+  - 내 주변 은행 및 ATM을 지도 위에 표시
+- **경로 안내**
+  - 현재 위치 → 선택 은행  
+  - 최적 이동 경로 시각화 (Kakao Mobility)
 
+---
 
-• MLflow를 활용한 실험 추적 및 모델 버전 관리
+## 🧠 AI 알고리즘 상세 (Technical Deep Dive)
 
-Data Eng.
+본 프로젝트는 기존 **LSTM 기반 시계열 모델의 한계**를 극복하기 위해  
+**Temporal Fusion Transformer (TFT)** 아키텍처를 주가 예측에 적용했습니다.
 
-• yfinance 대용량 시계열 데이터(20년치) 전처리 파이프라인 구축
+### 🏗 모델 아키텍처
 
+#### 🔹 Variable Selection Network (VSN)
 
+- **문제**
+  - 환율, 금리 등 14개 거시경제 변수가 오히려 노이즈로 작용
+- **해결**
+  - AI가 자동으로 **핵심 5개 피처 (OHLCV)** 만 선택
+  - 학습 안정성 및 예측 성능 향상
 
-• 금융감독원 예적금 API 및 환율 데이터 파싱 로직 구현
+#### 🔹 Multi-Head Attention
 
-2. 🛠 기술 스택 (Tech Stack)
+- 과거 20일 데이터 중  
+  현재 주가 형성에 결정적인 **‘골든 타임’**에 가중치 부여
 
-Frontend
+---
 
-Backend & Database
+### 📊 성과 (Simulation Result)
 
-AI & MLOps
+| 지표 | 결과 |
+|---|---|
+| 평균 ROI | **103.68%** |
+| 최고 ROI | **292.45%** |
 
-3. 🌟 핵심 기능 (Key Features)
+> **결론**  
+> 노이즈를 제거한 5-Feature 회귀 모델이  
+> 복잡한 다변수 모델 대비 압도적인 성능을 기록
 
-📈 AI 주가 예측 (TFT-R Engine)
+---
 
-"단순한 예측을 넘어, 시장의 맥락을 읽다"
+## 💬 프로젝트 회고 (Retrospective)
 
-실시간 예측: 사용자가 조회하는 즉시 최신 데이터를 수집하여 향후 등락률 예측
+### 장영철 (팀장)
 
-직관적 시그널: 복잡한 수치 대신 강력 매수, 보유, 매도 등 명확한 액션 가이드 제공
+> “프론트엔드부터 백엔드까지 전체 흐름을 주도하며  
+> 풀스택 개발자로서의 가능성을 확인했습니다.  
+>  
+> Vue 3의 컴포넌트 재사용성을 극대화하고  
+> Django와의 비동기 통신을 최적화하는 과정에서  
+> 실질적인 성장을 경험했습니다.  
+>  
+> 지도 API와 차트 라이브러리를 활용하며  
+> **데이터 시각화의 중요성**을 깊이 체감한 프로젝트였습니다.”
 
-근거 제시: 최근 20일간의 차트 흐름과 AI가 분석한 추세선 시각화
+---
 
-🏦 금융 상품 원스톱 관리
+### 양한빈 (팀원) — *데이터 사이언티스트의 양심*
 
-예적금 비교: 1금융권 및 저축은행의 모든 상품을 금리순/기간별로 비교
-
-하이브리드 추천: 내 정보(나이, 자산)와 유사한 유저들이 선택한 상품 추천 (Collaborative Filtering)
-
-AI 챗봇 상담: "사회초년생을 위한 공격적인 투자 상품 추천해줘"와 같은 자연어 질의 응답
-
-🗺 위치 기반 은행 찾기
-
-스마트 검색: 내 주변 은행 및 ATM 위치를 지도 위에 마커로 표시
-
-경로 안내: 현재 위치에서 선택한 은행까지의 최적 이동 경로 시각화 (Kakao Mobility)
-
-4. 🧠 AI 알고리즘 상세 (Technical Deep Dive)
-
-본 프로젝트는 단순 시계열 모델(LSTM)의 한계를 넘어, Temporal Fusion Transformer (TFT) 아키텍처를 주가 예측에 도입했습니다.
-
-🏗 모델 아키텍처
-
-VSN (Variable Selection Network)
-
-문제: 환율, 금리 등 14개의 거시경제 변수가 오히려 노이즈로 작용함.
-
-해결: AI가 스스로 가격 결정에 중요한 **5개 핵심 피처(OHLCV)**만 선별하여 학습 효율 극대화.
-
-Multi-Head Attention
-
-기능: 과거 20일 데이터 중, 현재 주가 형성에 결정적인 영향을 미친 '골든 타임'을 포착하여 가중치 부여.
-
-성과 (Simulation Result)
-
-평균 ROI: 103.68%
-
-최고 ROI: 292.45%
-
-결론: 노이즈를 제거한 5-Feature 회귀 모델이 복잡한 모델보다 압도적인 성능 발휘.
-
-5. 💬 프로젝트 회고 (Retrospective)
-
-장영철 (팀장)
-
-"프론트엔드부터 백엔드까지 전체 흐름을 주도하며 풀스택 개발자로서의 가능성을 확인했습니다. 특히 Vue 3의 컴포넌트 재사용성을 극대화하고, Django와의 비동기 통신을 최적화하는 과정에서 많은 성장을 이뤘습니다. 지도 API와 차트 라이브러리를 다루며 데이터 시각화의 중요성을 깊이 체감했습니다."
-
-양한빈 (팀원) - [데이터 사이언티스트의 양심]
-
-"초기에는 복잡한 모델이 무조건 좋을 것이라 믿고 수많은 변수를 넣었습니다. 하지만 우연한 실수로 돌려본 '단순한 모델'이 100% 이상의 수익률을 내는 것을 보고 충격을 받았습니다.
-
-기존에 준비했던 보고서를 엎어야 했지만, **'기술적 고집보다 데이터가 보여주는 진실을 따르는 것이 엔지니어의 양심'**임을 깨닫고 과감히 모델을 피벗(Pivot)했습니다. 화려한 알고리즘보다 정제된 데이터의 힘이 강력함을 증명한 뜻깊은 프로젝트였습니다."
+> “초기에는 복잡한 모델이 항상 더 좋을 것이라 믿었습니다.  
+> 하지만 우연히 실험한 ‘단순한 모델’이  
+> **100% 이상의 수익률**을 기록하며 제 생각을 완전히 바꿨습니다.  
+>  
+> 준비했던 보고서를 과감히 폐기하고 모델을 피벗하며  
+>  
+> **‘기술적 고집보다, 데이터가 말하는 진실을 따르는 것이  
+> 엔지니어의 양심’**  
+>  
+> 이라는 중요한 교훈을 얻은 뜻깊은 프로젝트였습니다.”
 
 실행화면 ![alt text](image.png)
 ![alt text](image-1.png)
