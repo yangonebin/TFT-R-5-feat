@@ -196,13 +196,13 @@ FinMatch는 개인 금융 데이터를 기반으로
 >  
 > 이라는 중요한 교훈을 얻은 뜻깊은 프로젝트였습니다.”
 
-실행화면 ![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
-![alt text](image-3.png)
-![alt text](image-4.png)
-![alt text](image-5.png)
-![alt text](image-6.png)
-![alt text](image-7.png)
-![alt text](image-8.png)
-![alt text](image-9.png)
+실행화면 ![alt text](/img/image.png)
+![alt text](/img/image-1.png)
+![alt text](/img/image-2.png)
+![alt text](/img/image-3.png)
+![alt text](/img/image-4.png)
+![alt text](/img/image-5.png)
+![alt text](/img/image-6.png)
+![alt text](/img/image-7.png)
+![alt text](/img/image-8.png)
+![alt text](/img/image-9.png)
