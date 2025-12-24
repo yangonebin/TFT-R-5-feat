@@ -70,7 +70,7 @@ const fetchPrediction = async () => {
 
   try {
     // FastAPI 서버 주소 (포트 8000번 확인)
-    const response = await axios.get('http://localhost:8000/predict')
+    const response = await axios.get('http://localhost:8001/predict')
     
     if (response.data.status === 'success') {
       prediction.value = response.data.result
